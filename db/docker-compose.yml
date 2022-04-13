@@ -2,6 +2,7 @@ version: '3.9'
 services:
   mysql:
     image: mariadb:10.7
+    container_name: wp_mysql
     volumes:
       - ./data/mysql:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql

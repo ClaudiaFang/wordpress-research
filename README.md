@@ -34,7 +34,7 @@ Take `example.com` as the example. Before config these docker compose, you need 
 3. Create a wordpress container for wordpress:
    1. Go to dir [ng-wp](./ng-wp), add the following config in the service part of docker-compose.yml
       ```docker
-      beta00_wp:
+      example_wp:
         image: wordpress:php8.1-fpm-alpine
         volumes:
           - ./data/html/example_wp:/var/www/html
