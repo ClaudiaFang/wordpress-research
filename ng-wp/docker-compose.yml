@@ -1,0 +1,56 @@
+version: '3.9'
+services:
+  beta00_wp:
+    image: wordpress:php8.1-fpm-alpine
+    volumes:
+      - ./data/html/beta00_wp:/var/www/html
+      - ./fpm-www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      WORDPRESS_DB_NAME: beta00_wp
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+    restart: always
+    networks:
+      - proxy
+
+  beta01_wp:
+    image: wordpress:php7.3-fpm-alpine
+    volumes:
+      - ./data/html/beta01_wp:/var/www/html
+      - ./fpm-www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+    depends_on:
+      - mysql
+    environment:
+      WORDPRESS_DB_HOST: mysql
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      WORDPRESS_DB_NAME: beta01_wp
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+    restart: always
+    networks:
+      - proxy
+
+  nginx:
+    image: nginx:alpine
+    environment:
+      TZ: Asia/Taipei
+    volumes:
+      - ./nginx_conf/nginx:/etc/nginx/conf.d:ro
+      - ./nginx_conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./data/html:/var/www/html
+    ports:
+      - 8090:80
+    depends_on:
+      - beta00_wp
+      - beta01_wp
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: proxy

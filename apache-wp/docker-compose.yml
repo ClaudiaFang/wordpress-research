@@ -1,0 +1,99 @@
+version: '3.9'
+
+services:
+
+  firstsun_wp:
+    # image: wordpress:5.9-fpm
+    image: wordpress:5.9
+    restart: always
+    container_name: firstsun_wp
+    # ports:
+    #   - :80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: firstsun_wp
+    depends_on:
+      - db
+    volumes:
+      - ./data/html/firstsun_wp:/var/www/html
+    networks:
+      - proxy
+
+  kirbyhsiao_wp:
+    image: wordpress:5.9
+    restart: always
+    container_name: kirbyhsiao_wp
+    # ports:
+    #   - :80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: kirbyhsiao_wp
+    depends_on:
+      - db
+    volumes:
+      - ./data/html/kirbyhsiao_wp:/var/www/html
+    networks:
+      - proxy
+
+  bamboo333_wp:
+    image: wordpress:5.9
+    restart: always
+    container_name: bamboo333_wp
+    # ports:
+    #   - :80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_pass
+      WORDPRESS_DB_NAME: bamboo333_wp
+    depends_on:
+      - db
+    volumes:
+      - ./data/html/bamboo333_wp:/var/www/html
+    networks:
+      - proxy
+  db:
+    image: mysql:5.7
+    restart: always
+    container_name: db
+    environment:
+      MYSQL_DATABASE: firstsun_wp
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./init.sql:/init/init.sql
+    networks:
+      - proxy
+    platform: linux/amd64
+    command: --init-file /init/init.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1
+    container_name: phpmyadmin
+    ports:
+      - "8088:80"
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      UPLOAD_LIMIT: 500M
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: proxy
+
+secrets:
+  MYSQL_ROOT_PASSWORD:
+    file: ./mysql_root_password

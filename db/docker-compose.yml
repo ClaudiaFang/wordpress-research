@@ -1,0 +1,36 @@
+version: '3.9'
+services:
+  mysql:
+    image: mariadb:10.7
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      MYSQL_DATABASE: mysql_db
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_pass
+    restart: always
+    networks:
+      - proxy
+    command: --init-file /docker-entrypoint-initdb.d/init.sql
+
+  ng_phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1
+    container_name: ng_phpmyadmin
+    ports:
+      - "8099:80"
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: mysql_root_pass
+      UPLOAD_LIMIT: 500M
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: proxy
